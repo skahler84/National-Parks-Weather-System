@@ -1,0 +1,26 @@
+﻿@model IList<FindSurveys>
+@{
+    ViewData["Title"] = "FindSurveys";
+
+    string imagePath = "";
+}
+
+<h1 style="font-size: 40px; font-weight: bold; color: forestgreen">Favorite Parks</h1>
+
+<style>
+    p {
+        display: inline-block;
+        text-align: center;
+    }
+</style>
+
+@{
+    foreach (FindSurveys survey in Model)
+    {
+      imagePath = "/images/parks/" + survey.ParkCode.ToLower() + ".jpg";
+
+        <div style="font-size: 25px; font-weight: bold; color: forestgreen;">
+            <p><img class="left-image" src="@imagePath" /> @survey.ParkName:   @survey.Count</p>
+        </div>
+    }
+}

@@ -1,0 +1,223 @@
+﻿@model WeatherList
+@{
+    ViewData["Title"] = "Detail";
+    string imagePath = "/images/parks/" + @Model.park.parkCode.ToLower() + ".jpg";
+    string tempType = Model.FahOrCalc;
+
+}
+
+<style>
+    div img {
+        height: 500px;
+    }
+
+    h1 {
+        font-size: 60px;
+        font-weight: bolder;
+    }
+
+    div p {
+        font-size: 20px;
+    }
+
+    .todayWeather {
+        display: inline-block;
+        text-align: center;
+        width: 250px;
+    }
+
+    .fourDayWeather {
+        display: inline-block;
+        text-align: center;
+        width: 750px;
+    }
+
+    #weather-container {
+        display:flex;
+        align-items: center;
+        flex-wrap:wrap;
+    }
+
+    form > label{
+        font-size: 20px;
+    }
+
+    input[type="radio"]{        
+        transform: scale(1.5);
+    }
+
+</style>
+
+@{
+    <div><img class="left-image" src="@imagePath" /></div>
+
+    <h1>@Model.park.parkName</h1>
+
+    <div>
+        <p><b>Park Description:</b> @Model.park.parkDescription</p>
+        <p><b>State:</b> @Model.park.state</p>
+        <p><b>Acreage:</b> @Model.park.acreage</p>
+        <p><b>Elevation in Feet:</b> @Model.park.elevationInFeet</p>
+        <p><b>Miles of Trail:</b> @Model.park.milesOfTrail</p>
+        <p><b>Number of Campsites:</b> @Model.park.numberOfCampsites</p>
+        <p><b>Climate:</b> @Model.park.climate</p>
+        <p><b>Year Founded:</b> @Model.park.yearFounded </p>
+        <p><b>Annul Number of Visitors:</b> @Model.park.annualVisitorCount</p>
+        <p><b>Inspiratonal Quote:</b> @Model.park.inspirationalQuote</p>
+        <p><b>Inspiratonal Quote Source:</b> @Model.park.inspirationalQuoteSource</p>
+        <p><b>Entry Fee:</b> @Model.park.entryFee</p>
+        <p><b>Number of Animal Species:</b> @Model.park.numberOfAnimalSpecies</p>
+    </div>
+}
+<br />
+<p style="        font-size: 24px;
+        font-weight: bold;
+">Display Temperature in:</p>
+
+<form asp-controller="Home" asp-action="TempChoice" method="get">
+    <input type="hidden" name="ParkCode" value="@Model.park.parkCode" />
+    <input type="radio" id="fahrenheit" asp-for="FahOrCalc" value="F">
+    <label asp-for="FahOrCalc">Fahrenheit</label>
+    <br />
+    <span></span>
+
+    <input type="radio" id="celsius" asp-for="FahOrCalc" value="C">
+    <label asp-for="FahOrCalc">Celsius</label>
+    <br />
+    <input type="submit" value="Submit" />
+</form>
+
+<br />
+<br />
+
+<div id="weather-container">
+    <div class="todayWeather">
+
+        @{
+            foreach (Weather weather in Model.weatherList)
+            {
+
+                if (weather.fiveDayForecastValue == 1)
+                {
+
+                    <p style="font-size: 24px; font-weight: bold;">Today</p>                    
+
+                    if (@weather.forecast == "sunny")
+                    {
+                        <div><img style="height: 200px;" src="/images/sunny.png" /></div>
+                        <p>Pack sunblock!</p>
+
+                    }
+                    else if (weather.forecast == "partly cloudy")
+                    {
+                        <div><img style="height: 200px;" src="/images/partlyCloudy.png" /></div>
+
+                    }
+                    else if (weather.forecast == "rain")
+                    {
+                        <div><img style="height: 200px;" src="/images/rain.png" /></div>
+                        <p>Pack rain gear and wear waterproof shoes!</p>
+
+                    }
+                    else if (weather.forecast == "snow")
+                    {
+                        <div><img style="height: 100px;" src="/images/snow.png" /></div>
+                        <p>Pack your snowshoes!</p>
+
+                    }
+                    else if (weather.forecast == "thunderstorms")
+                    {
+                        <div><img style="height: 100px;" src="/images/thunderstorms.png" /></div>
+                        <p>Seek shelter and avoid hiking on exposed ridges!</p>
+
+                    }
+                    else if (weather.forecast == "cloudy")
+                    {
+                        <div><img style="height: 100px;" src="/images/cloudy.png" /></div>
+
+                    }
+
+                    if (tempType == "C")
+                    {
+                        <p style="font-size: 20px; font-weight: bold;">High: @weather.ConvertToCelsius(weather.high).ToString("N0") Low: @weather.ConvertToCelsius(weather.low).ToString("N0")</p>
+
+                    }
+                    else
+                    {
+                        <p style="font-size: 20px; font-weight: bold;">High: @weather.high Low: @weather.low</p>
+
+                    }
+
+                    if (@weather.high > 75)
+                    {
+                        <p>Bring an extra gallon of water!</p>
+                    }
+                    if (@weather.low < 20)
+                    {
+                        <p>Danger of exposure to frigid temperatures!</p>
+                    }
+                    if (@weather.high - @weather.low > 20)
+                    {
+                        <p>Wear breathable layers!</p>
+                    }
+
+                    <p style="font-size: 20px; font-weight: bold;">Forecast: @weather.forecast</p>
+                }
+            }
+        }
+    </div>
+<div class="fourDayWeather" style="column-count: 4">
+    @{
+        foreach (Weather weather in Model.weatherList)
+        {
+            if (weather.fiveDayForecastValue >= 2 && weather.fiveDayForecastValue <= 5)
+            {
+                <div>
+                    <p>Day: @weather.fiveDayForecastValue</p>
+                    @{ if (@weather.forecast == "sunny")
+                        {
+                            <div><img style="height: 100px;" src="/images/sunny.png" /></div>
+                        }
+                        else if (weather.forecast == "partly cloudy")
+                        {
+                            <div><img style="height: 100px;" src="/images/partlyCloudy.png" /></div>
+                        }
+                        else if (weather.forecast == "rain")
+                        {
+                            <div><img style="height: 100px;" src="/images/rain.png" /></div>
+                        }
+                        else if (weather.forecast == "snow")
+                        {
+                            <div><img style="height: 100px;" src="/images/snow.png" /></div>
+                        }
+                        else if (weather.forecast == "thunderstorms")
+                        {
+                            <div><img style="height: 100px;" src="/images/thunderstorms.png" /></div>
+                        }
+                        else if (weather.forecast == "cloudy")
+                        {
+                            <div><img style="height: 100px;" src="/images/cloudy.png" /></div>
+                        }
+
+                        if (tempType == "C")
+                        {
+                            <p>High: @weather.ConvertToCelsius(weather.high).ToString("N0")</p>
+                            <p>Low: @weather.ConvertToCelsius(weather.low).ToString("N0")</p>
+
+                        }
+                        else
+                        {
+                            <p>High: @weather.high</p>
+                            <p>Low: @weather.low</p>
+
+                        }
+
+
+                    }
+
+                </div>
+            }
+        }
+    }
+</div>
+</div>
